@@ -4,17 +4,22 @@ from openai import OpenAI
 
 def reset_chat_history():
     st.session_state.messages = []
-    # Doesnt clear the prompt for some reason
-    # st.session_state.system_prompt_input = ""
-    # st.session_state.data_context = ""
+
 
 
 if __name__ == '__main__':
     st.title("LLM Demo")
-
-    data_context = st.text_area("Data", "Insert any context/information for the LLM. \nIt will be concatenated to the system prompt",
-                                height=34*6)
-    system_prompt_input = st.text_area("System Prompt", "Any instructions to the LLM to describe its role or persona...", height=34*4)
+    pixels_per_row = 34
+    data_context = st.text_area("Data", "The data for the LLM to understand as well as how to use it",
+                                height=pixels_per_row*4)
+    system_prompt_input = st.text_area("System Prompt", "Any instructions to the LLM to describe its role",
+                                height=pixels_per_row*4)
+    customer_persona = st.text_area("Customer Personal", "Any instructions about the customer the LLM would be responding to",
+                                height=pixels_per_row*4)
+    history = st.text_area("Previous Conversation", "Insert any historical conversations real or mock up to give the LLM examples",
+                                height=pixels_per_row*4)
+    # combining the prompt
+    full_prompt = "\n".join([data_context, system_prompt_input, customer_persona, history])
     left, middle, right = st.columns(3)
     llm_init = left.button("Initialize LLM", type="primary")
     reset_chat = right.button("Reset LLM", type="primary", on_click=reset_chat_history)
@@ -36,9 +41,6 @@ if __name__ == '__main__':
             st.markdown(message["content"])
 
     # Accept user input
-    # if llm_init:
-    full_prompt = f"{system_prompt_input.strip()}\n\n{data_context.strip()}"
-    # print(full_prompt)
     if prompt := st.chat_input("What is up?"):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
